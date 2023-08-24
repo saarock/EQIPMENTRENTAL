@@ -1,11 +1,9 @@
 import sys
-import datetime
+import datetime, os
 
 class shop_rental:
     def __init__(self, options):
         self.options = options
-
-    
 
     def clear_fine(self):
         try:
@@ -65,11 +63,14 @@ class shop_rental:
         algorithm for booking equipments
         '''
 
-        with open('datas.txt', 'r+') as file:
-            q = file.readlines()
-            if(len(q) > 0):
-                print('You already rented something to rent again you need to return first.')
-                self.return_rental_things()
+
+
+# To checked already rented somethings
+        # with open('datas.txt', 'r+') as file:
+        #     q = file.readlines()
+        #     if(len(q) > 0):
+        #         print('You already rented something to rent again you need to return first.')
+        #         self.return_rental_things()
 
 
         
@@ -81,13 +82,83 @@ class shop_rental:
         print(q_)
         quantity = input(f'Your Equipment: {eq} How many Quantity you want out of {q_[3]}')
         if(int(quantity) > int(q_[3]) or int(quantity)<= 0):
-            self.book()
+            print('Quantity not available try again')
+            self.rental_things()
         else:
             current_date = datetime.datetime.now()
             increased_date = current_date + datetime.timedelta(days=5)
             Due_date = increased_date.strftime("%Y:%m:%d")
  
-            with open('datas.txt', 'w') as file:
+            # checked that the equipment is already rented
+            y_n = os.path.exists(f'{q_[0]}.txt')
+            if(y_n):
+                file_path = f'{q_[0]}.txt'
+                with open(file_path, 'r') as file:
+                    all_datas = file.readlines()
+
+                updated = False
+
+                for i, line in enumerate(all_datas):
+                    if line.strip().startswith("Total Quantity:"):
+                      v_ = line.split(',')
+        
+                      if len(v_) >= 2:
+                          last_value = int(v_[-1].strip()) + int(quantity)
+                          v_[-1] = f'{last_value}\n'
+                          all_datas[i] = ', '.join(v_)
+                          updated = True
+                          break
+
+                if not updated:
+                    print("Total Quantity line not found in the file.")
+
+# Write the updated content back to the file
+                with open(file_path, 'w') as file_again:
+                    file_again.writelines(all_datas)
+
+                import write  # This import seems unnecessary and might lead to circular imports
+
+# Assuming the 'write.update_equipment_data' function is correct
+                write.update_equipment_data('equipment_data.txt', q_[0], int(quantity))
+                return
+
+                
+        #         with open(f'{q_[0]}.txt', 'r') as file:
+        #             all_datas = file.readlines()
+        #             print(all_datas[-2])
+        #             v = all_datas[-2]
+        #             v_  = v.split(',')
+
+        #             if len(v_) >= 2:  # Ensure there are at least 2 parts in the split
+        # # Update the quantity value and rewrite the line
+    
+        #                  last_value  = int(v_[-1].strip()) + int(quantity)
+        #                  new_quantity = int(quantity) + int(v_[-1].strip())  # Strip to remove any whitespace or newline
+        #                 #  return
+        #                  all_datas[-1] = f'{v_[0]}, {last_value}'  # Assuming v_[0] is the label before quantity
+        #                  print(last_value, 'THISIS MY LAST VALUE')
+        
+        # # Write the updated content back to the file
+        #                  with open(f'{q_[0]}.txt', 'w') as file_again:
+        #                       print(all_datas, 'Helll bhaiho')
+        #                       file_again.writelines(all_datas)
+        #                  import write
+        #                  write.update_equipment_data('equipment_data.txt', q_[0], int(quantity))
+        #                  return
+
+                    # print(v_, 'yes')
+                    # all_datas[-1] = f'{int(quantity)+int(v_[-1])}'
+                    # print(all_datas, 'I AM')
+                    # with open(f'{q_[0]}.txt' , 'w') as file_again:
+                    #     file_again.writelines(all_datas)
+                
+                    # return
+                #
+
+
+            
+ 
+            with open(f'{q_[0]}.txt', 'w') as file:
                 lines = [
                     f'Custumer Name: {c_name}\n',
                     f'Equipment: {q_[0]}\n',
@@ -104,8 +175,8 @@ class shop_rental:
             
 
 # Update after booking
-            import update
-            update.update_equipment_data('equipment_data.txt', q_[0], int(quantity))
+            import write
+            write.update_equipment_data('equipment_data.txt', q_[0], int(quantity))
             
     
 
@@ -194,7 +265,7 @@ let = shop_rental(['1: Rent Equipment', '2: Return Rent Equipment', '3: Exist'])
 
 
 # Step 2(Check the fine)
-let.check_fine()
+# let.check_fine()
 
 # step 3 (CALL THE FUNCTION TO SHOW THE OPTION)
 let.show_options()

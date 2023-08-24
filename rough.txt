@@ -1,0 +1,22 @@
+    with open(f'{q_[0]}.txt', 'r') as file:
+                    all_datas = file.readlines()
+                    print(all_datas[-2])
+                    v = all_datas[-2]
+                    v_  = v.split(',')
+
+                    if len(v_) >= 2:  # Ensure there are at least 2 parts in the split
+        # Update the quantity value and rewrite the line
+    
+                         last_value  = int(v_[-1].strip()) + int(quantity)
+                         new_quantity = int(quantity) + int(v_[-1].strip())  # Strip to remove any whitespace or newline
+                        #  return
+                         all_datas[-1] = f'{v_[0]}, {last_value}'  # Assuming v_[0] is the label before quantity
+                         print(last_value, 'THISIS MY LAST VALUE')
+        
+        # Write the updated content back to the file
+                         with open(f'{q_[0]}.txt', 'w') as file_again:
+                              print(all_datas, 'Helll bhaiho')
+                              file_again.writelines(all_datas)
+                         import write
+                         write.update_equipment_data('equipment_data.txt', q_[0], int(quantity))
+                         return
